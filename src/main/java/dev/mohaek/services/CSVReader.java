@@ -31,7 +31,7 @@ public class CSVReader {
                 funk.setName(linea[1]);
                 funk.setModelo(Modelo.valueOf(linea[2]));
                 funk.setPrecio(Double.parseDouble(linea[3]));
-                funk.setFecha_lanzamiento(LocalDate.parse(linea[4],formato));
+                funk.setFecha_lanzamiento(LocalDate.parse(linea[4],formato).atStartOfDay());
                 funks.add(funk);
             }
         }catch (Exception e){

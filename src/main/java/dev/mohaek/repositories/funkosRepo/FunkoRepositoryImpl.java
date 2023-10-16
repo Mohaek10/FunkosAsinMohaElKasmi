@@ -113,7 +113,7 @@ public class FunkoRepositoryImpl implements FuncoRepository {
                               .name(res.getString("nombre"))
                               .modelo(Modelo.valueOf(res.getString("modelo")))
                               .precio(res.getDouble("precio"))
-                              .fecha_lanzamiento(res.getDate("fecha").toLocalDate())
+                              .fecha_lanzamiento(res.getDate("fecha").toLocalDate().atStartOfDay())
                               .build());
                   } else {
                       logger.error("Funko no encontrado con id: " + aLong);
@@ -189,7 +189,7 @@ public class FunkoRepositoryImpl implements FuncoRepository {
                             .name(res.getString("nombre"))
                             .modelo(Modelo.valueOf(res.getString("modelo")))
                             .precio(res.getDouble("precio"))
-                            .fecha_lanzamiento(res.getDate("fecha").toLocalDate())
+                            .fecha_lanzamiento(res.getDate("fecha").toLocalDate().atStartOfDay())
                             .build());
                 }
             } catch (SQLException e) {
@@ -220,7 +220,7 @@ public class FunkoRepositoryImpl implements FuncoRepository {
                             .name(rs.getString("nombre"))
                             .modelo(Modelo.valueOf(rs.getString("modelo")))
                             .precio(rs.getDouble("precio"))
-                            .fecha_lanzamiento(rs.getDate("fecha").toLocalDate())
+                            .fecha_lanzamiento(rs.getDate("fecha").toLocalDate().atStartOfDay())
                             .build();
                     // Lo añadimos a la lista
                     lista.add(funko);

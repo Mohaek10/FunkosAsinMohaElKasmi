@@ -9,7 +9,7 @@ public interface FunkoService {
 
     List<Funko> findByNombre(String nombre) throws Exception;
 
-    Funko findById(long id) throws Exception;
+    Object findById(long id) throws Exception;
 
     Funko save(Funko funko) throws Exception;
 
