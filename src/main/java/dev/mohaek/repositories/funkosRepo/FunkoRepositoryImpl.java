@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -126,21 +127,110 @@ public class FunkoRepositoryImpl implements FuncoRepository {
 
     @Override
     public CompletableFuture<Void> deleteAll() throws SQLException {
-        return null;
+        return CompletableFuture.runAsync(()->{
+            String query = "DELETE FROM FUNKOS";
+            try (var connection = db.getConnection();
+                 var stmt = connection.prepareStatement(query)
+            ) {
+                logger.debug("Borrando todos los funkos");
+                var res = stmt.executeUpdate();
+                if (res > 0) {
+                    logger.debug("Funkos borrados");
+                } else {
+                    logger.error("Error al borrar los funkos");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
     }
 
     @Override
     public CompletableFuture<Boolean> deleteById(Long aLong) throws SQLException {
-        return null;
+        return CompletableFuture.supplyAsync(()->{
+            boolean deleted = false;
+            String query = "DELETE FROM FUNKOS WHERE id = ?";
+            try (var connection = db.getConnection();
+                 var stmt = connection.prepareStatement(query)
+            ) {
+                logger.debug("Borrando el funko con id: " + aLong);
+                stmt.setLong(1, aLong);
+                var res = stmt.executeUpdate();
+                if (res > 0) {
+                    logger.debug("Funko borrado");
+                    deleted = true;
+                } else {
+                    logger.error("Error al borrar el funko");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return deleted;
+
+        });
     }
 
     @Override
     public CompletableFuture<List<Funko>> findAll() throws SQLException {
-        return null;
+        return CompletableFuture.supplyAsync(()->{
+            List<Funko> lista=new ArrayList<>();
+            String query = "SELECT * FROM FUNKOS";
+            try (var connection = db.getConnection();
+                 var stmt = connection.prepareStatement(query)
+            ) {
+                logger.debug("Buscando todos los funkos");
+                var res = stmt.executeQuery();
+                while (res.next()) {
+                    lista.add(Funko.builder()
+                            .id(res.getLong("id"))
+                            .uuid(res.getObject("cod", UUID.class))
+                            .myId(res.getLong("MyID"))
+                            .name(res.getString("nombre"))
+                            .modelo(Modelo.valueOf(res.getString("modelo")))
+                            .precio(res.getDouble("precio"))
+                            .fecha_lanzamiento(res.getDate("fecha").toLocalDate())
+                            .build());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return lista;
+        });
     }
 
     @Override
     public CompletableFuture<List<Funko>> findByNombre(String nombre) {
-        return null;
+        return CompletableFuture.supplyAsync(()->{
+            var lista = new ArrayList<Funko>();
+            String query = "SELECT * FROM FUNKOS WHERE nombre LIKE ?";
+            try (var connection = db.getConnection();
+                 var stmt = connection.prepareStatement(query)
+            ) {
+                logger.debug("Buscando todos los funkos por nombre que contenga: " + nombre);
+                // Vamos a usar Like para buscar por nombre
+                stmt.setString(1, "%" + nombre + "%");
+                var rs = stmt.executeQuery();
+                while (rs.next()) {
+                    // Creamos un alumno
+                    Funko funko = Funko.builder()
+                            .id(rs.getLong("id"))
+                            .uuid(rs.getObject("cod", UUID.class))
+                            .myId(rs.getLong("MyID"))
+                            .name(rs.getString("nombre"))
+                            .modelo(Modelo.valueOf(rs.getString("modelo")))
+                            .precio(rs.getDouble("precio"))
+                            .fecha_lanzamiento(rs.getDate("fecha").toLocalDate())
+                            .build();
+                    // Lo añadimos a la lista
+                    lista.add(funko);
+                }
+            } catch (SQLException e) {
+                logger.error("Error al buscar funkos por nombre ", e);
+                throw new RuntimeException(e);
+
+            }
+            return lista;
+        });
     }
 }

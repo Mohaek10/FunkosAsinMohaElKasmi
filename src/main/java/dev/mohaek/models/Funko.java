@@ -4,6 +4,7 @@ import lombok.*;
 
 import dev.mohaek.services.IdGenerator;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -19,6 +20,8 @@ public class Funko {
     private String name;
     private Modelo modelo;
     private double precio;
-    private LocalDate fecha_lanzamiento;
+    @Builder.Default
+
+    private LocalDateTime fecha_lanzamiento= LocalDateTime.now();
 
 }
